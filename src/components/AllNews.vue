@@ -1,22 +1,23 @@
 <template>
-  <div class="my-container">
+  <div class="container">
     <div class="row">
-      <div class="col-3 right-navbar">
 
+      <div class="col-4 right-navbar">
         <datepicker v-model="dateSelected" :format="customFormatter"/>
         <div class="list-group list-articles">
           <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active"
              v-for="(news, i) in currentNews" v-bind:key="i"
              v-on:click.stop="setSelectedNews(i)">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">http://www.skysports.com/football/news</h5>
+              <h5 class="mb-1">www.skysports.com</h5>
               <small>{{news.date}}</small>
             </div>
             <p class="mb-1">{{news.title}}</p>
           </a>
         </div>
       </div>
-      <div class="col-9 article">
+
+      <div class="col-8 article">
         <div v-if="Object.keys(newsSelected).length > 0" class="col-12">
           <div class="title">
             <h1>{{newsSelected.title}}</h1>
