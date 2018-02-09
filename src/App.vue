@@ -1,12 +1,24 @@
 <template>
   <div id="app">
+    <navbar></navbar>
     <router-view/>
   </div>
 </template>
 
 <script>
+import Navbar from './components/Navbar'
+
 export default {
-  name: 'App'
+  components: {Navbar},
+  name: 'App',
+  mounted () {
+    this.setDisabledDateFrom()
+  },
+  methods: {
+    setDisabledDateFrom () {
+      this.$store.dispatch('setDisabledDateFrom')
+    }
+  }
 }
 </script>
 
@@ -16,6 +28,5 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

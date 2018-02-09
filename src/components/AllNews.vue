@@ -1,9 +1,8 @@
 <template>
-  <div class="container">
+  <div class="my-container">
     <div class="row">
 
       <div class="col-4 right-navbar">
-        <datepicker v-model="dateSelected" :format="customFormatter"/>
         <div class="list-group list-articles">
           <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active"
              v-for="(news, i) in currentNews" v-bind:key="i"
@@ -26,7 +25,7 @@
             <p>{{newsSelected.description}}</p>
           </div>
           <div class="paragraph">
-            <p v-for="(paragraph, i) in newsSelected.dbpedia.split('<br>')" v-bind:key="'par'+i" v-html="paragraph"></p>
+            <p class="text-justify" v-for="(paragraph, i) in newsSelected.dbpedia.split('<br>')" v-bind:key="'par'+i" v-html="paragraph"></p>
           </div>
         </div>
       </div>
@@ -35,50 +34,19 @@
 </template>
 
 <script>
-import Datepicker from 'vuejs-datepicker'
-import moment from 'moment'
-
 export default {
-  name: 'HelloWorld',
-  components: { Datepicker },
+  name: 'AllNews',
   computed: {
-    allNews () {
-      return this.$store.getters.allNews
-    },
     currentNews () {
       return this.$store.getters.currentNews
     },
     newsSelected () {
       return this.$store.getters.newsSelected
-    },
-    dateSelected: {
-      get () {
-        return this.$store.getters.dateSelected
-      },
-      set (value) {
-        console.log(value)
-        this.$store.dispatch('setDateSelected', value)
-        this.loadNewsFromDate()
-      }
     }
   },
-  mounted () {
-    this.loadNewsFromDate()
-  },
   methods: {
-    customFormatter (date) {
-      return moment(date).format('DD/MM/YY')
-    },
     setSelectedNews (index) {
       this.$store.dispatch('setNewsSelected', this.currentNews[index])
-    },
-    loadNewsFromDate () {
-      this.$store.dispatch('cleanNews')
-      this.allNews.forEach((news, index) => {
-        if (news.date === moment(this.dateSelected).format('DD/MM/YY')) {
-          this.$store.dispatch('pushNews', news)
-        }
-      })
     }
   }
 }
@@ -90,14 +58,11 @@ export default {
     margin: 10px 0;
   }
   .my-container{
-    margin: 50px 50px;
+    margin: 20px 50px 20px;
   }
   .list-articles{
-    height:80vh;
+    height:calc(100vh - 124px);
     overflow: auto;
-  }
-  .article{
-    padding: 20px 20px;
   }
   .title{
     margin: 0 0 30px;
