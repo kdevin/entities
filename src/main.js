@@ -5,7 +5,11 @@ import Vuex from 'vuex'
 import App from './App'
 import router from './router'
 import store from './store/store.js'
+import VueResource from 'vue-resource'
+import dbpediaPlugin from './plugins/lookup-dbpedia'
 
+Vue.use(dbpediaPlugin)
+Vue.use(VueResource)
 Vue.use(Vuex)
 Vue.config.productionTip = false
 

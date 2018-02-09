@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
 import moment from 'moment'
 
 import allNews from '../assets/news.json'
@@ -12,6 +11,7 @@ export default new Vuex.Store({
     allNews: allNews,
     currentNews: [],
     newsSelected: {},
+    thumbnails: [],
     dateSelected: new Date(2018, 0, 1),
     disabled: {to: new Date(2018, 0, 1), from: new Date(2018, 0, 1)}
   },
@@ -19,6 +19,7 @@ export default new Vuex.Store({
     allNews: state => state.allNews,
     currentNews: state => state.currentNews,
     newsSelected: state => state.newsSelected,
+    thumbnails: state => state.thumbnails,
     dateSelected: state => state.dateSelected,
     disabled: state => state.disabled
   },
@@ -32,6 +33,9 @@ export default new Vuex.Store({
     },
     setNewsSelected: (state, value) => {
       state.newsSelected = value
+    },
+    setThumbnails: (state, value) => {
+      state.thumbnails = value
     },
     setDateSelected: (state, value) => {
       state.dateSelected = value
@@ -67,6 +71,9 @@ export default new Vuex.Store({
     },
     setNewsSelected: function ({ commit }, diff) {
       commit('setNewsSelected', diff)
+    },
+    setThumbnails: function ({ commit }, diff) {
+      commit('setThumbnails', diff)
     }
   }
 })

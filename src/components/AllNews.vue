@@ -2,7 +2,7 @@
   <div class="my-container">
     <div class="row">
 
-      <div class="col-4 right-navbar">
+      <div class="col-4" id="left">
         <div class="list-group list-articles">
           <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active"
              v-for="(news, i) in currentNews" v-bind:key="i"
@@ -15,6 +15,8 @@
           </a>
         </div>
       </div>
+
+      <div class="invisible col-4"><!--hidden spacer--></div>
 
       <div class="col-8 article">
         <div v-if="Object.keys(newsSelected).length > 0" class="col-12">
@@ -42,11 +44,32 @@ export default {
     },
     newsSelected () {
       return this.$store.getters.newsSelected
+    },
+    thumbnails () {
+      return this.$store.getters.thumbnails
     }
   },
   methods: {
     setSelectedNews (index) {
-      this.$store.dispatch('setNewsSelected', this.currentNews[index])
+      var diff = this.currentNews[index]
+
+      var parser = new DOMParser()
+      var doc = parser.parseFromString(diff.dbpedia, 'text/html')
+
+      var promises = []
+      // var promises2 = []
+
+      Array.from(doc.getElementsByTagName('a')).forEach((el) => {
+        promises.push(this.$getTypeOfEntities(el))
+        // promises2.push(this.$getThumbnail(el))
+      })
+
+      Promise.all(promises).then(() => {
+        diff.dbpedia = doc.body.innerHTML
+        this.$store.dispatch('setNewsSelected', diff)
+      }).catch(function (err) {
+        console.log(err)
+      })
     }
   }
 }
@@ -54,15 +77,22 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  br {
-    margin: 10px 0;
-  }
   .my-container{
-    margin: 20px 50px 20px;
+    margin: 0 50px 0;
+  }
+  #left {
+    position: fixed;
+    top: 84px;
+    bottom: 0;
+    padding-top: 20px;
   }
   .list-articles{
     height:calc(100vh - 124px);
     overflow: auto;
+  }
+
+  .article{
+    padding-left: 40px;
   }
   .title{
     margin: 0 0 30px;
@@ -73,5 +103,8 @@ export default {
   }
   .paragraph > p{
     font-size: 19px;
+  }
+  br {
+    margin: 10px 0;
   }
 </style>
