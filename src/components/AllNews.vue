@@ -2,7 +2,7 @@
   <div class="my-container">
     <div class="row">
 
-      <div class="col-4" id="left">
+      <div class="col-3" id="left">
         <div class="list-group list-articles">
           <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active"
              v-for="(news, i) in currentNews" v-bind:key="i"
@@ -16,9 +16,9 @@
         </div>
       </div>
 
-      <div class="invisible col-4"><!--hidden spacer--></div>
+      <div class="invisible col-3"><!--hidden spacer--></div>
 
-      <div class="col-8 article">
+      <div class="col-6 article">
         <div v-if="Object.keys(newsSelected).length > 0" class="col-12">
           <div class="title">
             <h1>{{newsSelected.title}}</h1>
@@ -31,6 +31,15 @@
           </div>
         </div>
       </div>
+
+      <div class="col-3 article">
+        <div v-for="(thumb, i) in thumbnails" v-bind:key="'thumb'+i">
+          <div class="col-12 thumbnail" v-if="thumb !== null">
+            <img class="img-fluid rounded" v-bind:title="thumb.entity" :src="thumb.image" alt="Thumbnail">
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -57,20 +66,34 @@ export default {
       var doc = parser.parseFromString(diff.dbpedia, 'text/html')
 
       var promises = []
-      // var promises2 = []
 
       Array.from(doc.getElementsByTagName('a')).forEach((el) => {
         promises.push(this.$getTypeOfEntities(el))
-        // promises2.push(this.$getThumbnail(el))
+        promises.push(this.$getThumbnail(el))
       })
 
-      Promise.all(promises).then(() => {
+      Promise.all(promises).then(thumbnails => {
         diff.dbpedia = doc.body.innerHTML
         this.$store.dispatch('setNewsSelected', diff)
+        this.$store.dispatch('setThumbnails', this.removeDuplicates(thumbnails.filter(function (n) { return n !== undefined && n !== null }), 'entity'))
       }).catch(function (err) {
         console.log(err)
       })
+    },
+    removeDuplicates (originalArray, prop) {
+      var newArray = []
+      var lookupObject = {}
+
+      for (var i in originalArray) {
+        lookupObject[originalArray[i][prop]] = originalArray[i]
+      }
+
+      for (i in lookupObject) {
+        newArray.push(lookupObject[i])
+      }
+      return newArray
     }
+
   }
 }
 </script>
@@ -106,5 +129,8 @@ export default {
   }
   br {
     margin: 10px 0;
+  }
+  .thumbnail{
+    margin-bottom: 20px;
   }
 </style>

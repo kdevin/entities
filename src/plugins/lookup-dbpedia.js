@@ -4,7 +4,7 @@ export default {
       var array = el.getAttribute('title').split('/')
       var entity = array[array.length - 1]
       return new Promise((resolve, reject) => {
-        this.$http.get('http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?&QueryString=' + entity)
+        this.$http.get('http://localhost:1111/api/search.asmx/KeywordSearch?QueryString=' + encodeURIComponent(entity))
           .then(response => {
             if (response.body.results.length !== 0) {
               var result = response.body.results.find(function (result) { return result.uri === 'http://dbpedia.org/resource/' + entity })
@@ -23,11 +23,11 @@ export default {
                 } else if (classes.some(function (type) { return type.uri === 'http://dbpedia.org/ontology/SoccerClub' })) {
                   el.setAttribute('class', 'green')
                 } else if (classes.some(function (type) { return type.uri === 'http://dbpedia.org/ontology/Stadium' })) {
-                  el.setAttribute('class', 'blue')
+                  el.setAttribute('class', 'red')
                 }
               }
             }
-            resolve(null)
+            resolve()
           }, (response) => {
             reject(response)
           })
@@ -36,15 +36,18 @@ export default {
     Vue.prototype.$getThumbnail = function (el) {
       var array = el.getAttribute('title').split('/')
       var entity = array[array.length - 1]
-  
+      
+      var resource = '<http://dbpedia.org/resource/' + entity + '>'
+      var query = 'PREFIX dbpedia-owl: <http://dbpedia.org/ontology/> SELECT ?thumbnail WHERE {' + resource + ' dbpedia-owl:thumbnail ?thumbnail}'
+      
       return new Promise((resolve, reject) => {
-        this.$http.get('http://dbpedia.org/data/' + entity + '.json')
+        this.$http.get('http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&query=' + encodeURIComponent(query) + '&output=json')
           .then(response => {
-            var thumbnail = null
-            if (typeof response.body['http://dbpedia.org/resource/' + entity]['http://dbpedia.org/ontology/thumbnail'] !== 'undefined') {
-              thumbnail = response.body['http://dbpedia.org/resource/' + entity]['http://dbpedia.org/ontology/thumbnail'][0].value
+            if (response.body.results.bindings.length === 0) {
+              resolve(null)
+            } else {
+              resolve({'entity': entity, 'image': response.body.results.bindings[0].thumbnail.value})
             }
-            resolve(thumbnail)
           }, (response) => {
             reject(response)
           })

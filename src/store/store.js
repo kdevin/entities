@@ -24,9 +24,10 @@ export default new Vuex.Store({
     disabled: state => state.disabled
   },
   mutations: {
-    cleanNews: (state) => {
+    clean: (state) => {
       state.currentNews = []
       state.newsSelected = []
+      state.thumbnails = []
     },
     pushNews: (state, value) => {
       state.currentNews.push(value)
@@ -59,7 +60,7 @@ export default new Vuex.Store({
     },
     setDateSelected: function ({ commit }, diff) {
       commit('setDateSelected', diff)
-      commit('cleanNews')
+      commit('clean')
       this.getters.allNews.forEach((news) => {
         if (news.date === moment(this.getters.dateSelected).format('DD/MM/YY')) {
           commit('pushNews', news)
