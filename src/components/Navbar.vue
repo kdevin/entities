@@ -10,7 +10,13 @@
 		</h1>
 
 		<div class="collapse navbar-collapse text-center" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto"></ul>
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item m-3">
+					<router-link to="/articles" class="btn btn-outline-primary border-0 text-light" tag="button" active-class="active">
+						Articles
+					</router-link>
+				</li>
+			</ul>
 			<ul class="navbar-nav">
 				<li class="nav-item m-3">
 					<datepicker v-model="dateSelected" :disabled="disabled" :format="customFormatter"/>
