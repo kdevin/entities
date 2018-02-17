@@ -3,30 +3,26 @@ export default {
     Vue.prototype.$getTypeOfEntities = function (el) {
       var array = el.getAttribute('title').split('/')
       var entity = array[array.length - 1]
+    
+      var resource = '<http://dbpedia.org/resource/' + entity + '>'
+      var query = 'SELECT ?classes WHERE { ' + resource + ' rdf:type ?classes }'
+    
       return new Promise((resolve, reject) => {
-        this.$http.get('http://localhost:1111/api/search.asmx/KeywordSearch?QueryString=' + encodeURIComponent(entity))
+        this.$http.get('http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&query=' + encodeURIComponent(query) + '&output=json')
           .then(response => {
-            if (response.body.results.length !== 0) {
-              var result = response.body.results.find(function (result) { return result.uri === 'http://dbpedia.org/resource/' + entity })
-              var classes = null
-              if (typeof result !== 'undefined') {
-                classes = result.classes
-              } else {
-                classes = response.body.results[0].classes
+            var classes = response.body.results.bindings
+            
+            classes.forEach((object) => {
+              if (object.classes.value === 'http://dbpedia.org/ontology/SoccerManager') {
+                el.setAttribute('class', 'orange')
+              } else if (object.classes.value === 'http://dbpedia.org/ontology/SoccerPlayer') {
+                el.setAttribute('class', 'yellow')
+              } else if (object.classes.value === 'http://dbpedia.org/ontology/SoccerClub') {
+                el.setAttribute('class', 'green')
+              } else if (object.classes.value === 'http://dbpedia.org/ontology/Stadium') {
+                el.setAttribute('class', 'red')
               }
-  
-              if (classes.length !== 0) {
-                if (classes.some(function (type) { return type.uri === 'http://dbpedia.org/ontology/SoccerManager' })) {
-                  el.setAttribute('class', 'orange')
-                } else if (classes.some(function (type) { return type.uri === 'http://dbpedia.org/ontology/SoccerPlayer' })) {
-                  el.setAttribute('class', 'yellow')
-                } else if (classes.some(function (type) { return type.uri === 'http://dbpedia.org/ontology/SoccerClub' })) {
-                  el.setAttribute('class', 'green')
-                } else if (classes.some(function (type) { return type.uri === 'http://dbpedia.org/ontology/Stadium' })) {
-                  el.setAttribute('class', 'red')
-                }
-              }
-            }
+            })
             resolve()
           }, (response) => {
             reject(response)
